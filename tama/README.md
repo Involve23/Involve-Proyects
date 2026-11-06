@@ -34,6 +34,7 @@ Claude Code lee `CLAUDE.md` al abrir: ahí están el proceso de trabajo (plan �
 | `npm run construir` | Genera `dist/` (principal + una captura por empresa). |
 | `npm run dev` | Construye y arranca el servidor local. |
 | `npm run verificar` | Revisa manifiesto, plantilla y sintaxis de cada HTML. |
+| `node scripts/cargar-conocimiento.mjs --simular` | Valida una carga documental (cada cita contra su nota). Con `--lote=…` la escribe en el servidor local; ver el encabezado del script. |
 | `python3 tests/ejecutar_todo.py` | Todas las pruebas de navegador. Requiere `pip install playwright` y `playwright install chromium`. |
 
 ## Estructura

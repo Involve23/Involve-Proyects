@@ -5,3 +5,8 @@ datos-locales/
 __pycache__/
 *.pyc
 .DS_Store
+
+# Notas internas del wiki (nombres, precios y borradores legales): no se suben al repo público
+conocimiento/
+# Carga curada con precios internos y borradores legales: no se sube al repo público
+datos-de-apoyo/involve-productos/carga.json
