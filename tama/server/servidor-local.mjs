@@ -27,6 +27,15 @@ const HOST = process.env.HOST || '127.0.0.1';
 const CLAVE = process.env.ANTHROPIC_API_KEY || '';
 const MODELO = process.env.CLAUDE_MODEL || 'claude-sonnet-5-5';
 const URL_API = process.env.ANTHROPIC_URL || 'https://api.anthropic.com/v1/messages';
+/* Proveedor de IA: «anthropic» (API de Anthropic, necesita clave) o «local» (un modelo en esta computadora con
+ * API compatible con OpenAI: Ollama, LM Studio, llama.cpp…). Sin IA_PROVEEDOR se usa Anthropic si hay clave. */
+const PROVEEDOR = (process.env.IA_PROVEEDOR || (CLAVE ? 'anthropic' : '')).trim().toLowerCase();
+const URL_LOCAL = process.env.IA_LOCAL_URL || 'http://127.0.0.1:11434/v1/chat/completions';
+const MODELO_LOCAL = process.env.IA_LOCAL_MODELO || 'qwen2.5:14b';
+const IA_ACTIVA = PROVEEDOR === 'local' || (PROVEEDOR === 'anthropic' && !!CLAVE);
+const MODELO_ACTIVO = PROVEEDOR === 'local' ? MODELO_LOCAL : MODELO;
+const DESC_IA = !IA_ACTIVA ? 'no configurada' : PROVEEDOR === 'local' ? `modelo local ${MODELO_LOCAL} (nada sale de esta computadora)` : `Claude vía API de Anthropic (${MODELO})`;
+const ESPERA_MS = Number(process.env.IA_ESPERA_MS || (PROVEEDOR === 'local' ? 300000 : 120000));
 const USUARIO = { id: process.env.USUARIO_ID || 'local', nombre: process.env.USUARIO_NOMBRE || 'Brayan' };
 const DIST = path.join(RAIZ, 'dist');
 const DATOS = process.env.DATOS_DIR ? path.resolve(process.env.DATOS_DIR) : path.join(RAIZ, 'datos-locales');
@@ -107,10 +116,37 @@ function extraerJson(texto) {
   if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
   throw new Error('sin JSON');
 }
-async function interpretar({ prompt, modo }) {
-  if (!CLAVE) return { codigo: 'no_sample', mensaje: 'Falta ANTHROPIC_API_KEY en .env' };
+const comoResultado = (texto, modo) => {
+  if (modo === 'text') return { resultado: texto };
+  try { return { resultado: extraerJson(texto) }; } catch (e) { return { codigo: 'invalid_json', mensaje: 'La respuesta no era JSON' }; }
+};
+async function interpretarLocal({ prompt, modo }) {
   const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), 120000);
+  const t = setTimeout(() => ctl.abort(), ESPERA_MS);
+  try {
+    const mensajes = modo === 'json'
+      ? [{ role: 'system', content: 'Responde únicamente con JSON válido, sin texto antes ni después y sin bloques de código.' }, { role: 'user', content: prompt }]
+      : [{ role: 'user', content: prompt }];
+    const r = await fetch(URL_LOCAL, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model: MODELO_LOCAL, messages: mensajes, temperature: 0.2, max_tokens: 4096, stream: false }),
+      signal: ctl.signal,
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return { codigo: 'error', mensaje: (j.error && (j.error.message || j.error)) || 'Error ' + r.status + ' del modelo local' };
+    const texto = (((j.choices || [])[0] || {}).message || {}).content || '';
+    return comoResultado(texto, modo);
+  } catch (e) {
+    if (e.name === 'AbortError') return { codigo: 'error', mensaje: 'El modelo local tardó demasiado' };
+    return { codigo: 'error', mensaje: `No responde el modelo local en ${URL_LOCAL}. ¿Está abierto Ollama o LM Studio?` };
+  } finally { clearTimeout(t); }
+}
+async function interpretar({ prompt, modo }) {
+  if (!IA_ACTIVA) return { codigo: 'no_sample', mensaje: 'Sin IA configurada: pon ANTHROPIC_API_KEY o IA_PROVEEDOR=local en .env' };
+  if (PROVEEDOR === 'local') return interpretarLocal({ prompt, modo });
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ESPERA_MS);
   try {
     const r = await fetch(URL_API, {
       method: 'POST',
@@ -124,8 +160,7 @@ async function interpretar({ prompt, modo }) {
       return { codigo, mensaje: (j.error && j.error.message) || 'Error ' + r.status };
     }
     const texto = (j.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('');
-    if (modo === 'text') return { resultado: texto };
-    try { return { resultado: extraerJson(texto) }; } catch (e) { return { codigo: 'invalid_json', mensaje: 'La respuesta no era JSON' }; }
+    return comoResultado(texto, modo);
   } catch (e) {
     return { codigo: 'error', mensaje: e.name === 'AbortError' ? 'Tiempo de espera agotado' : String(e.message || e) };
   } finally { clearTimeout(t); }
@@ -138,7 +173,7 @@ function paginaInicio() {
 <style>body{font:16px/1.55 system-ui,sans-serif;max-width:640px;margin:48px auto;padding:0 20px;color:#0f0f0f;background:#f2f2f2}h1{font-size:28px}li{margin:6px 0}a{color:#4c34b2;font-weight:600}.ok{color:#2e6a1a}.no{color:#806000}code{background:#fff;padding:2px 6px;border-radius:6px}</style>
 <h1>Servidor local</h1>
 <p>Abre una de estas aplicaciones. Cada una guarda sus datos aparte en <code>datos-locales/</code>.</p><ul>${lista}</ul>
-<p>Interpretación con Claude: ${CLAVE ? `<span class="ok">activa</span> (modelo <code>${MODELO}</code>)` : '<span class="no">no configurada</span>. Sin ella, la captura sigue con una pregunta a la vez. Pon tu clave en <code>.env</code> (ver <code>.env.example</code>).'}</p>
+<p>Interpretación con IA: ${IA_ACTIVA ? `<span class="ok">activa</span>: ${DESC_IA}` : '<span class="no">no configurada</span>. Sin ella, la captura sigue con una pregunta a la vez. Pon tu clave o <code>IA_PROVEEDOR=local</code> en <code>.env</code> (ver <code>.env.example</code>).'}</p>
 <p>Usuario: <strong>${USUARIO.nombre}</strong></p></html>`;
 }
 function paginaApp(nombre) {
@@ -166,7 +201,7 @@ const servidor = http.createServer(async (req, res) => {
       const f = path.join(VENDOR, path.basename(p));
       return fs.existsSync(f) ? enviar(res, 200, fs.readFileSync(f), TIPOS['.js'], { 'Cache-Control': 'max-age=86400' }) : enviar(res, 404, 'No existe');
     }
-    if (p === '/api/capacidades') return enviar(res, 200, { sample: !!CLAVE, modelo: MODELO });
+    if (p === '/api/capacidades') return enviar(res, 200, { sample: IA_ACTIVA, modelo: MODELO_ACTIVO, proveedor: PROVEEDOR || null });
     if (p === '/api/usuario') return enviar(res, 200, USUARIO);
     if (p === '/api/sample' && req.method === 'POST') {
       const cuerpo = await leerCuerpo(req);
@@ -226,6 +261,6 @@ process.on('SIGINT', salir); process.on('SIGTERM', salir);
 servidor.listen(PUERTO, HOST, () => {
   console.log(`\nServidor local en http://localhost:${PUERTO}`);
   console.log(`  Aplicaciones: ${apps().join(', ') || '(ninguna: ejecuta npm run construir)'}`);
-  console.log(`  Interpretación con Claude: ${CLAVE ? 'activa (' + MODELO + ')' : 'NO configurada (falta ANTHROPIC_API_KEY en .env); la captura seguirá con una pregunta a la vez'}`);
+  console.log(`  Interpretación con IA: ${IA_ACTIVA ? 'activa, ' + DESC_IA : 'NO configurada (pon ANTHROPIC_API_KEY o IA_PROVEEDOR=local en .env); la captura seguirá con una pregunta a la vez'}`);
   console.log(`  Datos en ${path.relative(process.cwd(), DATOS) || DATOS}\n`);
 });

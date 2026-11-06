@@ -75,8 +75,10 @@
   const muestra = async (prompt) => interpretar(prompt, 'text');
   muestra.json = (prompt) => interpretar(prompt, 'json');
 
+  listo.then(([, caps]) => { window.claude.iaLocal = caps.proveedor === 'local'; }, () => {});
   window.claude = {
     local: true,
+    iaLocal: false,
     use: async (nombre) => {
       const [info, caps] = await listo;
       if (nombre === 'db') return db;

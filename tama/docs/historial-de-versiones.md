@@ -7,10 +7,13 @@ La **versión de la aplicación** (V1.x.y) habla del código. Los **lanzamientos
 - **V1.1.0** — Sistema de diseño Genesis 2.0 modo métría: sidebar flotante, barra superior, componentes y grafo sobre superficie oscura.
 - **V1.2.0** — Captura de lo particular a lo general (ruta de productos → clientes → empresa → grupo) y panel de equipo en vivo.
 - **V1.3.0** — Captura conversacional por bloques con Claude: sugerencias, ejemplos, «lo que entendí», memoria de lo aprendido por empresa. Base reiniciada y estructura limpia de las cinco empresas.
+- **V1.3.2** — IA local sin costo en localhost: con `IA_PROVEEDOR=local` el servidor usa un modelo en la propia computadora (Ollama, LM Studio o cualquier API compatible con OpenAI; por defecto `qwen2.5:14b`) en lugar de la API de Anthropic. El aviso de la captura conversacional dice que nada sale de la computadora. En claude.ai no cambia nada. Probado con Qwen 2.5 14B en un M4 de 24 GB: arma el bloque en ≈30 s e interpreta una respuesta en ≈40 s.
 - **V1.3.1** — Motor de conversación para varios nodos a la vez, suscripción a las consultas del equipo y corrección del cierre de la estructura HTML.
 
 ## Capturas por empresa
 - **Captura V1.0.0** — Una por empresa (Involve, Doble Cinco, Impuldesa, Involvia, Urvem): alta hablando de ficha, productos y clientes; ruta de tres pasos; varios productos o clientes a la vez; interpretación entre bloques para no repetir preguntas; pendientes con Brayan o Marketing; descarga de respuestas. Corregida la carga inicial (esperar la primera lectura de la base).
+
+- **Captura V1.0.1** — El aviso de la conversación distingue la IA local de Claude.
 
 ## Cargas de datos
 Las cargas de datos no cambian el código de la aplicación (V1.3.1 sigue igual); se registran aquí.

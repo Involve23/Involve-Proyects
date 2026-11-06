@@ -209,7 +209,9 @@ async function cvStart(only,group){
   say((group?'':levelMsg())+'Vamos a conversar por bloques: te cuento de qué trata cada uno, tú respondes con tus palabras y yo anoto lo que entienda. Son '+CV.blocks.length+(CV.blocks.length===1?' bloque.':' bloques.')+(CV.blocks[0].prio?' Empiezo por lo prioritario.':''));
   if(!CV.told){
     CV.told=true;
-    say('Aviso: lo que escribas aquí se envía a Claude para interpretarlo, junto con la ficha de '+E.nombre+' y lo ya capturado. No se envían archivos. Siempre verás lo que entendí antes de guardarlo.');
+    say(window.claude&&window.claude.iaLocal
+      ?'Aviso: lo que escribas aquí lo interpreta un modelo de IA que corre en esta computadora, junto con la ficha de '+E.nombre+' y lo ya capturado. Nada sale de ella. Siempre verás lo que entendí antes de guardarlo.'
+      :'Aviso: lo que escribas aquí se envía a Claude para interpretarlo, junto con la ficha de '+E.nombre+' y lo ya capturado. No se envían archivos. Siempre verás lo que entendí antes de guardarlo.');
   }
   cvRunBlock();
 }
