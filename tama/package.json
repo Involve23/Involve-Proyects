@@ -1,0 +1,15 @@
+{
+  "name": "tama-inteligencia-organizacional",
+  "version": "1.3.1",
+  "private": true,
+  "description": "Inteligencia organizacional multidisciplinaria de Grupo Tama: aplicación principal y capturas por empresa.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "construir": "node scripts/construir.mjs",
+    "verificar": "node scripts/verificar.mjs",
+    "servidor": "node server/servidor-local.mjs",
+    "dev": "node scripts/construir.mjs && node server/servidor-local.mjs",
+    "probar": "python3 tests/ejecutar_todo.py"
+  }
+}

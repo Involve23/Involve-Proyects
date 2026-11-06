@@ -1,0 +1,21 @@
+{
+  "orden": [
+    "00_base_captura_clasica.js",
+    "10_modelo_y_cliente.js",
+    "20_grafo_universo.js",
+    "30_base_de_datos.js",
+    "40_importar_csv.js",
+    "50_motor_estadistico.js",
+    "60_analisis_y_documentos.js",
+    "70_sugerencias_logica.js",
+    "71_sugerencias_interfaz.js",
+    "80_catalogo_cliente.js",
+    "85_segmentos_de_cliente.js",
+    "90_backoffice.js",
+    "91_estructura_de_pantalla.js",
+    "92_ruta_y_equipo.js",
+    "93_conversacion_por_bloques.js",
+    "99_arranque.js"
+  ],
+  "variante_captura": "variante_captura_ceo.js"
+}

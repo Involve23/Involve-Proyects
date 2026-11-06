@@ -1,0 +1,24 @@
+{
+ "nodes": {
+  "GRP-0001-8": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "GRP-0001-8",
+   "nombre": "Grupo Tama",
+   "padre": null,
+   "tipo": "GRP"
+  },
+  "EMP-0003-4": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "EMP-0003-4",
+   "nombre": "Impuldesa",
+   "padre": "GRP-0001-8",
+   "tipo": "EMP"
+  }
+ }
+}

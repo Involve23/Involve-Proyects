@@ -1,0 +1,130 @@
+{
+ "nodes": {
+  "GRP-0001-8": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "GRP-0001-8",
+   "nombre": "Grupo Tama",
+   "padre": null,
+   "tipo": "GRP"
+  },
+  "EMP-0001-8": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "EMP-0001-8",
+   "nombre": "Involve",
+   "padre": "GRP-0001-8",
+   "tipo": "EMP"
+  },
+  "CLI-0001-8": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "CLI-0001-8",
+   "nombre": "Cliente de Involve",
+   "descripcion": "",
+   "padre": "EMP-0001-8",
+   "tipo": "CLI"
+  },
+  "EMP-0002-6": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "EMP-0002-6",
+   "nombre": "Doble Cinco",
+   "padre": "GRP-0001-8",
+   "tipo": "EMP"
+  },
+  "CLI-0002-6": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "CLI-0002-6",
+   "nombre": "Cliente de Doble Cinco",
+   "descripcion": "",
+   "padre": "EMP-0002-6",
+   "tipo": "CLI"
+  },
+  "EMP-0003-4": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "EMP-0003-4",
+   "nombre": "Impuldesa",
+   "padre": "GRP-0001-8",
+   "tipo": "EMP"
+  },
+  "CLI-0003-4": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "CLI-0003-4",
+   "nombre": "Cliente de Impuldesa",
+   "descripcion": "",
+   "padre": "EMP-0003-4",
+   "tipo": "CLI"
+  },
+  "EMP-0004-2": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "EMP-0004-2",
+   "nombre": "Involvia",
+   "padre": "GRP-0001-8",
+   "tipo": "EMP"
+  },
+  "CLI-0004-2": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "CLI-0004-2",
+   "nombre": "Cliente de Involvia",
+   "descripcion": "",
+   "padre": "EMP-0004-2",
+   "tipo": "CLI"
+  },
+  "EMP-0005-9": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "EMP-0005-9",
+   "nombre": "Urvem",
+   "padre": "GRP-0001-8",
+   "tipo": "EMP"
+  },
+  "CLI-0005-9": {
+   "alias": [],
+   "creado": "2026-11-05T00:00:00.000Z",
+   "estado": "activo",
+   "por": null,
+   "id": "CLI-0005-9",
+   "nombre": "Cliente de Urvem",
+   "descripcion": "",
+   "padre": "EMP-0005-9",
+   "tipo": "CLI"
+  }
+ },
+ "counters": {
+  "GRP": {
+   "n": 1
+  },
+  "EMP": {
+   "n": 5
+  },
+  "CLI": {
+   "n": 5
+  }
+ }
+}

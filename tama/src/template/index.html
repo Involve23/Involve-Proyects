@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{TITULO}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+{{ESTILOS}}
+</style>
+</head>
+<body class="{{CLASE_BODY}}" data-theme="metria">
+<div class="scrim" id="scrim"></div>
+<aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+  <div class="brand"><svg viewBox="0 0 34 34" aria-hidden="true" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"><line x1="17" y1="7" x2="8" y2="25"/><line x1="17" y1="7" x2="26" y2="25"/><line x1="8" y1="25" x2="26" y2="25"/><circle cx="17" cy="7" r="4" fill="#6EE3E3" stroke="#6EE3E3"/><circle cx="8" cy="25" r="4" fill="#352B6D"/><circle cx="26" cy="25" r="4" fill="#9789D0" stroke="#9789D0"/></svg><div><b>{{MARCA}}</b><small>{{SUBMARCA}}</small></div></div>
+  <nav class="tabs" aria-label="Secciones">
+{{NAV}}  </nav>
+  <div class="sbfoot"><span class="appver" title="Versión de la aplicación">{{VERSION}}</span><span>Sistema de diseño Genesis 2.0</span></div>
+</aside>
+<div class="shell">
+<header class="topbar">
+  <button class="menubtn" id="menubtn" type="button" aria-label="Abrir el menú" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="crumb"><span class="sec0">Grupo Tama</span><span class="sepc">›</span><b id="crumb-sec">{{CRUMB}}</b></div>
+  <div class="sync" id="sync" role="status">Conectando…</div>
+</header>
+
+<!-- ===== Universo ===== -->
+<section class="view" id="v-universe">
+  <svg id="gsvg" role="img" aria-label="Grafo del modelo Tama: grupo, empresas, productos y cliente, con sus corrientes, áreas y variables como nodos. Haz clic en un nodo para abrirlo y ver su ficha."></svg>
+  <div class="ghud">
+    <div class="eyebrow">Grupo Tama · Universo del cliente</div>
+    <h1>Inteligencia organizacional multidisciplinaria</h1>
+    <div class="gstats" id="g-stats"></div>
+    <div class="ctrls">
+      <button class="btn" id="g-open" type="button">Abrir corrientes</button>
+      <button class="btn" id="g-close" type="button">Contraer todo</button>
+      <button class="btn" id="g-cap" type="button" aria-pressed="false">Solo lo capturado</button>
+      <button class="btn" id="g-fit" type="button">Recentrar</button>
+    </div>
+    <div class="ghint">Clic en un nodo: abrir y ver su ficha · Arrastra para mover · Rueda para acercar</div>
+  </div>
+  <details class="glegend"><summary>Leyenda</summary>
+    <div class="lgrid">
+      <span><i style="background:#6EE3E3"></i>Grupo, empresa, producto</span>
+      <span><i style="background:#FF9F68"></i>Corriente de análisis</span>
+      <span><i style="background:#FFFFFF"></i>Cliente</span>
+      <span><i style="background:#6EE3E3;opacity:.4"></i>Por capturar (sin datos)</span>
+      <span><i style="background:#FF6B9A"></i>Hallazgo</span>
+      <span><i style="background:#FFD479"></i>Sugerencia</span>
+      <span><i style="background:#8FD18F"></i>Variable con dato (relleno, color por área)</span>
+      <span><i class="hollow"></i>Variable pendiente (sin relleno)</span>
+    </div>
+  </details>
+  <div class="gpanel" id="gpanel" hidden></div>
+  <div class="tip" id="tip" hidden></div>
+</section>
+
+<!-- ===== Capturar ===== -->
+<main class="view page" id="v-capture" hidden>
+  <div>
+    <div class="path" id="path"></div>
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <div class="composer" id="composer"></div>
+    <div class="meta" id="meta">
+      <span>Aplica a la siguiente respuesta:</span>
+      <label>Fuente
+        <select id="m-fuente"><option value="auto">Según el catálogo</option><option value="Interna">Interna</option><option value="Primaria">Primaria</option><option value="Externa">Externa</option><option value="Derivada">Derivada</option></select>
+      </label>
+      <label>Confianza
+        <select id="m-conf"><option>Alta</option><option selected>Media</option><option>Baja</option></select>
+      </label>
+      <label>Periodo
+        <input type="month" id="m-per">
+      </label>
+      <label style="flex:1 1 280px">Nota de hallazgo
+        <input type="text" id="m-nota" maxlength="300" placeholder="Opcional: qué notaste en este dato" style="flex:1;min-width:200px">
+      </label>
+    </div>
+  </div>
+  <aside class="side">
+    <div class="card"><h2>Ruta de captura</h2><div id="ladder"></div></div>
+    <div class="card" id="card-dims"><h2>Avance del nodo actual</h2><div id="dims"></div></div>
+    <div class="card"><h2>Lo que he aprendido</h2><div id="mem"></div></div>
+    <div class="card"><h2>Equipo <span class="live" id="team-pill">En vivo</span></h2><div id="team-live" role="status" aria-live="polite"></div><div id="team"></div><h3 class="subh">Últimos registros</h3><ul class="recent" id="recent"></ul></div>
+  </aside>
+</main>
+
+<!-- ===== Base de datos ===== -->
+<main class="view page" id="v-data" hidden>
+  <div class="pagehead"><h2>Base de datos</h2><p>Todo lo que se va guardando de las empresas y sus clientes, en una base compartida. Cada fila conserva su ID, su fuente y quién la capturó.</p></div>
+  <div class="statrow" id="dbStats"></div>
+  <nav class="subtabs" aria-label="Vistas de la base">
+    <button class="subtab" data-sub="obs" aria-selected="true">Observaciones</button>
+    <button class="subtab" data-sub="imp" aria-selected="false">Importar CSV</button>
+    <button class="subtab" data-sub="nodes" aria-selected="false">Nodos</button>
+    <button class="subtab" data-sub="hal" aria-selected="false">Hallazgos y sugerencias</button>
+    <button class="subtab" data-sub="cover" aria-selected="false">Cobertura</button>
+    <button class="subtab" data-sub="catalog" aria-selected="false">Catálogo</button>
+    <button class="subtab" data-sub="export" aria-selected="false">Exportar</button>
+  </nav>
+
+  <div class="subview" id="s-obs">
+    <div class="filters">
+      <select id="o-emp" aria-label="Filtrar por empresa"></select>
+      <select id="o-dim" aria-label="Filtrar por dimensión"></select>
+      <input id="o-q" type="search" placeholder="Buscar por ID, variable, valor o persona" aria-label="Buscar" autocomplete="off">
+      <span class="res" id="o-count"></span>
+    </div>
+    <div class="card scroll"><table class="tbl" id="obsTbl"></table></div>
+  </div>
+
+  <div class="subview" id="s-imp" hidden>
+    <div id="imp-dest" class="card"></div>
+    <div id="imp-work" class="card" style="margin-top:14px"></div>
+    <div id="imp-hist"></div>
+  </div>
+
+  <div class="subview" id="s-nodes" hidden>
+    <div class="idcheck">
+      <input id="idin" placeholder="Verificar un ID, ej. EMP-0001-8" aria-label="ID a verificar" autocomplete="off" spellcheck="false">
+      <button class="btn" id="idgo" type="button">Verificar</button>
+      <span class="res" id="idres" role="status"></span>
+    </div>
+    <div class="card scroll"><table class="tbl" id="nodesTbl"></table></div>
+    <div id="nodeDetail" style="margin-top:16px"></div>
+  </div>
+
+  <div class="subview" id="s-hal" hidden>
+    <p class="empty" style="margin-bottom:12px">Cada hallazgo guarda los datos en los que se apoya y de él sale una sugerencia con su plan de acción. Puedes cambiar el estado de cada sugerencia.</p>
+    <div class="card scroll"><table class="tbl" id="halTbl"></table></div>
+  </div>
+
+  <div class="subview" id="s-cover" hidden>
+    <p class="empty" style="margin-bottom:12px">Variables registradas sobre las aplicables a cada nodo. Las de nivel empresa cuentan en la empresa y las de nivel producto, en cada producto.</p>
+    <div class="card scroll" id="coverWrap"></div>
+  </div>
+
+  <div class="subview" id="s-catalog" hidden>
+    <div class="stack">
+      <div class="card">
+        <h3 style="font-size:16px">Agregar variable</h3>
+        <p class="empty" style="margin-top:4px">Recibe el siguiente ID y se pregunta en las próximas capturas. Puedes limitarla a una sola empresa.</p>
+        <div class="formgrid">
+          <label class="wide">Nombre de la variable<input id="cv-nombre" autocomplete="off"></label>
+          <label class="wide">Pregunta que se hará en la captura<input id="cv-q" autocomplete="off"></label>
+          <label>Dimensión<select id="cv-dim"></select></label>
+          <label>Nivel<select id="cv-nivel"><option value="P">Producto</option><option value="E">Empresa</option><option value="C">Cliente (buyer persona)</option></select></label>
+          <label>Fuente<select id="cv-fuente"><option value="I">Interna</option><option value="P">Primaria</option><option value="X">Externa</option><option value="D">Derivada</option></select></label>
+          <label>Tipo de respuesta<select id="cv-tipo"><option value="t">Texto</option><option value="n">Número</option><option value="p">Porcentaje</option><option value="e">Escala 1 a 5</option><option value="sn">Sí / No</option></select></label>
+          <label>Aplica a<select id="cv-emp"><option value="">Todas las empresas</option></select></label>
+        </div>
+        <div class="row2"><button class="btn main" id="cv-add" type="button">Agregar variable</button><span class="res" id="cv-res" role="status"></span></div>
+      </div>
+      <div class="card">
+        <div class="filters"><label style="display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px">Dimensión<select id="cv-filter"></select></label></div>
+        <div class="scroll"><table class="tbl" id="catTbl"></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subview" id="s-export" hidden>
+    <div class="card">
+      <p id="exStats" class="empty"></p>
+      <div class="row2">
+        <button class="btn main" id="ex-csv" type="button">Observaciones (CSV)</button>
+        <button class="btn main" id="ex-json" type="button">Grafo completo (JSON)</button>
+      </div>
+      <p class="empty" id="exNote" style="margin-top:12px"></p>
+    </div>
+  </div>
+</main>
+
+<!-- ===== Motor estadístico ===== -->
+<main class="view page" id="v-motor" hidden>
+  <div class="pagehead"><h2>Motor estadístico</h2><p>Calcula en tu navegador con lo que hay capturado. Cada análisis solo corre cuando hay datos suficientes según los umbrales; si no, te dice qué falta.</p></div>
+  <nav class="subtabs" aria-label="Análisis del motor">
+    <button class="msub" data-ms="resumen" aria-selected="true">Resumen</button>
+    <button class="msub" data-ms="panorama" aria-selected="false">Panorama y brechas</button>
+    <button class="msub" data-ms="asoc" aria-selected="false">Asociaciones y regresión</button>
+    <button class="msub" data-ms="perfiles" aria-selected="false">Perfiles y cross-selling</button>
+    <button class="msub" data-ms="pron" aria-selected="false">Pronóstico</button>
+    <button class="msub" data-ms="config" aria-selected="false">Configuración</button>
+  </nav>
+  <div id="motor-body"></div>
+</main>
+
+<!-- ===== Análisis ===== -->
+<main class="view page" id="v-analisis" hidden>
+  <div class="pagehead"><h2>Análisis</h2><p>Lo capturado, lo que encontró el motor y los hallazgos, convertido en lecturas para decidir. Los textos de esta pestaña se arman con plantillas a partir de los datos; el documento de Word los redacta Claude.</p></div>
+  <nav class="subtabs" aria-label="Entregables de análisis">
+    <button class="asub" data-as="diag" aria-selected="true">Diagnóstico por empresa</button>
+    <button class="asub" data-as="comp" aria-selected="false">Comparativo del grupo</button>
+    <button class="asub" data-as="casos" aria-selected="false">Casos de uso de cliente</button>
+    <button class="asub" data-as="corr" aria-selected="false">Lectura por corriente</button>
+  </nav>
+  <div id="an-ctl"></div>
+  <div id="an-doc" style="margin:6px 0 14px"></div>
+  <div id="an-body"></div>
+</main>
+
+<!-- ===== Sugerencias ===== -->
+<main class="view page" id="v-sugerencias" hidden>
+  <div class="pagehead"><h2>Sugerencias</h2><p>De las señales que detecta el sistema a acciones con responsable, plazo e indicador. Claude redacta los borradores y el equipo decide; después se priorizan y se mide si funcionaron.</p></div>
+  <nav class="subtabs" aria-label="Sugerencias">
+    <button class="gsub" data-gs="bandeja" aria-selected="true">Bandeja</button>
+    <button class="gsub" data-gs="prio" aria-selected="false">Prioridad</button>
+    <button class="gsub" data-gs="seg" aria-selected="false">Seguimiento</button>
+    <button class="gsub" data-gs="tab" aria-selected="false">Tablero</button>
+  </nav>
+  <div id="sg-body"></div>
+</main>
+
+<!-- ===== Backoffice ===== -->
+<main class="view page" id="v-backoffice" hidden>
+  <div class="pagehead"><h2>Backoffice</h2><p>El catálogo maestro de variables, en la estructura general tipo Tama: qué mide cada una, qué pregunta se hace, a quién aplica y en qué versión va. Se edita con historial y se publica en lanzamientos.</p></div>
+  <nav class="subtabs" aria-label="Backoffice">
+    <button class="bsub" data-bs="matriz" aria-selected="true">Matriz</button>
+    <button class="bsub" data-bs="lanz" aria-selected="false">Lanzamientos</button>
+  </nav>
+  <div id="bo-body"></div>
+</main>
+<aside id="bo-panel" hidden aria-label="Ficha de la variable"></aside>
+
+<!-- ===== Cómo funciona ===== -->
+<main class="view page" id="v-how" hidden>
+  <div class="how">
+    <section id="how-top">
+      <div class="eyebrow">Inteligencia organizacional multidisciplinaria · Grupo Tama</div>
+      <h2 style="font-size:32px;margin:6px 0 14px">Cómo funciona</h2>
+      <p class="lead">La inteligencia organizacional multidisciplinaria reúne, empresa por empresa, lo que Tama necesita saber sobre su mercado, sus productos y su cliente, mirándolo desde varias disciplinas a la vez: mercado, psicología del consumidor, antropología, economía, finanzas y más. Lo guarda en un grafo donde todo tiene un ID propio y se puede rastrear, y cuando hay datos suficientes lo analiza con estadística para responder preguntas de negocio y proponer acciones.</p>
+      <p class="live" id="how-live"></p>
+      <div class="jump">
+        <button class="btn" data-go="how-flow" type="button">El recorrido</button>
+        <button class="btn" data-go="how-graph" type="button">El grafo</button>
+        <button class="btn" data-go="how-data" type="button">Cómo entra un dato</button>
+        <button class="btn" data-go="how-csv" type="button">Importar un CSV</button>
+        <button class="btn" data-go="how-stage" type="button">Qué se pregunta primero</button>
+        <button class="btn" data-go="how-engine" type="button">Cómo se analiza</button>
+        <button class="btn" data-go="how-an" type="button">Análisis y documentos</button>
+        <button class="btn" data-go="how-sug" type="button">De hallazgo a sugerencia</button>
+        <button class="btn" data-go="how-sg" type="button">Sugerencias y seguimiento</button>
+        <button class="btn" data-go="how-cv" type="button">Captura conversacional</button>
+        <button class="btn" data-go="how-eq" type="button">Captura en equipo</button>
+        <button class="btn" data-go="how-bo" type="button">Backoffice de variables</button>
+        <button class="btn" data-go="how-read" type="button">Cómo leer el grafo</button>
+        <button class="btn" data-go="how-state" type="button">Estado y siguientes pasos</button>
+      </div>
+    </section>
+
+    <section id="how-flow">
+      <h3>El recorrido, de punta a punta</h3>
+      <p>Un dato nace en una conversación y termina convertido en una sugerencia. Son cinco pasos, y cada uno deja huella para poder volver a revisarlo.</p>
+      <div class="pipeline">
+        <div class="step"><b>1 · Captura</b><p>Un chat guía a quien captura, empresa por empresa, con su cliente y sus productos.</p><span class="badge ok">Listo</span></div>
+        <div class="step"><b>2 · Registro</b><p>Cada respuesta se guarda como una observación con ID propio, fuente, confianza y periodo.</p><span class="badge ok">Listo</span></div>
+        <div class="step"><b>3 · Grafo</b><p>Grupo, empresas, productos, clientes y variables quedan conectados y se ven como nodos.</p><span class="badge ok">Listo</span></div>
+        <div class="step"><b>4 · Análisis</b><p>Un motor estadístico que corre en tu navegador según los datos disponibles, y lecturas por empresa, grupo, cliente y corriente, con documento de Word.</p><span class="badge part">Versión 1</span></div>
+        <div class="step"><b>5 · Sugerencias</b><p>Detectores proponen señales, Claude redacta borradores, el equipo los acepta, se priorizan por impacto y esfuerzo y se mide si el indicador mejoró.</p><span class="badge part">Versión 1</span></div>
+      </div>
+    </section>
+
+    <section id="how-graph">
+      <h3>El grafo y sus capas</h3>
+      <p>Un grafo es una red de nodos (las cosas) y relaciones (cómo se conectan). Todos los nodos llevan un ID propio con un prefijo que dice qué son.</p>
+      <div class="card scroll" style="margin-top:12px"><table class="tbl">
+        <thead><tr><th>Capa</th><th>Nodos</th><th>Ejemplo de ID</th><th>Para qué sirve</th></tr></thead>
+        <tbody>
+          <tr><td>Estructura</td><td>Grupo, Empresa, Producto y Cliente (uno o varios buyer persona por empresa, uno por segmento).</td><td class="mono">GRP-0001-x · EMP-0001-x · PRD-0001-x · CLI-0001-x</td><td>Quién es quién y de quién depende.</td></tr>
+          <tr><td>Plantillas</td><td>Satélites del Grupo, uno por corriente de análisis (mercado, antropología, finanzas, economía y más).</td><td class="mono">—</td><td>Guardan la estructura: todas las áreas y variables que cada empresa debe tener.</td></tr>
+          <tr><td>Conocimiento</td><td>Dimensión (áreas de variables), Variable, Observación.</td><td class="mono">VAR-003 · OBS-000142-x</td><td>Qué se sabe de cada nodo y de dónde salió.</td></tr>
+          <tr><td>Salidas</td><td>Hallazgo y Sugerencia.</td><td class="mono">HAL-0001-x · SUG-0001-x</td><td>Lo que el modelo concluye y recomienda.</td></tr>
+        </tbody></table></div>
+      <h4>El cliente es un buyer persona, y puede haber varios por empresa</h4>
+      <p>El nodo Cliente no es una persona real: es la definición abstracta del buyer persona que consume los productos de una empresa. Una empresa puede tener varios, uno por segmento. Cada segmento tiene su <b>tipo</b> (B2C, B2B, B2B2C o institucional) y su <b>estrategia</b> principal (adquisición, retención, cross-selling o recuperación). Cada cliente tiene las mismas 13 corrientes de análisis que la empresa, vistas desde el cliente: quién es, cómo decide, cuánto puede pagar, dónde compra, qué dice, cómo decide su organización si es B2B. Al definir el tipo, solo se le preguntan las variables que aplican: por ejemplo, la edad solo a B2C y el centro de compra solo a B2B e institucional. El chat te guía para definir los segmentos al crear una empresa o al completar su ficha, y siempre puedes agregar otro con <b>Nuevo segmento de cliente</b>.</p>
+      <p>Como el cliente es un arquetipo, no hace falta identificar a cada comprador ni cruzar registros entre empresas. El cruce se hace entre perfiles: dos clientes de empresas distintas se unen con una línea punteada cuando sus perfiles coinciden en al menos dos variables. Es una regla simple de coincidencia, no una medida estadística, y es el primer paso hacia el cross-selling entre empresas.</p>
+      <h4>Una corriente de análisis por satélite</h4>
+      <p>Del Grupo cuelgan los satélites. Cada uno es una <b>corriente de análisis</b> con su propia estructura de áreas, bloques y variables: Análisis de mercado (que incluye Marketing), Antropología, Sociología, Investigación cualitativa, Semiótica, Ciencia sensorial, Economía, Estadística y ciencia de datos, Retail y business intelligence, Social listening, Psicología del consumidor (con el neuromarketing como una de sus ramas), Finanzas y Gestión del negocio.</p>
+      <p>Los satélites son plantillas: no guardan datos de ninguna empresa. Sirven para saber qué variables considerar y para ver cuánto se ha capturado en total. Cada empresa tiene esas mismas corrientes con su información; también las tiene su Cliente y cada uno de sus Productos, que son nodos dentro de la empresa. Cada nodo muestra solo las variables de su nivel: las de empresa, las de cliente o las de producto. Si se agrega una variable a una corriente, queda disponible para todas las empresas.</p>
+      <h4>Dónde se llena cada variable</h4>
+      <p>Cada variable indica en qué nodo se llena: el <b>Cliente</b> (por ejemplo, su audiencia o sus rituales de consumo), la <b>Empresa</b> (por ejemplo, sus canales o sus estados financieros) o el <b>Producto</b> (por ejemplo, su oferta o su perfil sensorial). Así una misma pregunta de negocio puede cruzar varias corrientes.</p>
+      <h4>Las corrientes</h4>
+      <div class="card scroll" style="margin-top:12px"><table class="tbl" id="how-corr"></table></div>
+      <p>El catálogo está abierto: se pueden agregar variables nuevas, incluso solo para una empresa.</p>
+      <details class="det"><summary>Ver todas las áreas por corriente</summary>
+      <div class="dimgrid" id="how-dims"></div></details>
+      <p class="empty" style="margin-top:10px">Análisis de mercado reúne el universo de mkt del equipo, generalizado para cualquier empresa, y un análisis documental de un método publicado. Las demás corrientes son un borrador armado desde marcos estándar de cada disciplina. Todo es un punto de partida.</p>
+    </section>
+
+    <section id="how-data">
+      <h3>Cómo entra un dato</h3>
+      <ol>
+        <li>Creas la empresa con su ficha: industria, categoría, mercado, la pregunta de negocio, la decisión que se tomará y las fuentes disponibles. También describes a su cliente típico.</li>
+        <li>El chat arma primero el perfil del cliente (su audiencia) con unas pocas preguntas.</li>
+        <li>Eliges el producto, o creas uno nuevo e indicas su etapa del ciclo de vida.</li>
+        <li>El chat pregunta las variables, primero las prioritarias para esa etapa. Puedes responder, marcar “No aplica”, omitir o cambiar de dimensión. Cada pregunta trae una guía de cómo responder, para que el dato sea útil al análisis.</li>
+        <li>Cada respuesta se guarda como una <b>observación</b>: qué nodo describe, qué variable mide, el valor, la fuente (interna, primaria, externa o derivada), la confianza, el periodo al que se refiere, quién la capturó y cuándo. Si quieres, también una nota de hallazgo con lo que notaste en ese dato.</li>
+        <li>Si vuelves a responder la misma variable, no se pisa nada: se agrega una observación nueva y la más reciente es la vigente. El historial se conserva.</li>
+      </ol>
+      <h4>Anatomía de un ID</h4>
+      <div class="idanat"><div><span class="p">EMP</span><small>tipo de nodo</small></div><span class="d">-</span><div><span class="n">0003</span><small>número secuencial</small></div><span class="d">-</span><div><span class="c">4</span><small>dígito verificador</small></div></div>
+      <ul>
+        <li>Lo asigna el modelo al crear el nodo. Nunca se edita ni se reutiliza.</li>
+        <li>No contiene nombres, RFC ni fechas, así que no depende de datos del cliente y no se rompe si una empresa cambia de razón social.</li>
+        <li>El dígito verificador detecta errores de captura. En Base de datos › Nodos puedes verificar cualquier ID.</li>
+      </ul>
+    </section>
+
+    <section id="how-csv">
+      <h3>Importar información que ya existe</h3>
+      <p>Si la empresa ya tiene datos en un CSV (ventas, clientes, encuestas, una ficha de variables), no hace falta capturarlos a mano. En Base de datos › Importar CSV:</p>
+      <ol>
+        <li>Eliges la empresa y, si el archivo es de un producto, el producto.</li>
+        <li>Subes el archivo. Acepta cualquier forma (tabla con muchas filas o ficha de variable y valor) y separador coma, punto y coma, tabulador o barra. Se lee en tu navegador.</li>
+        <li>La página resume cada columna: tipo de dato, vacíos, valores distintos, mínimo, máximo y promedio.</li>
+        <li>Claude propone a qué variable corresponde cada columna (y con eso a qué corriente y área), cómo resumirla (suma, promedio, último valor…), variables nuevas para lo que no encaja y preguntas para quien captura. También puedes mapear a mano.</li>
+        <li>Tú revisas y corriges. Nada se guarda hasta que confirmas.</li>
+        <li>Lo confirmado queda como observaciones con fuente “Archivo”, con una nota de qué columna y cómo se calculó, y con un registro de la importación (<span class="mono">IMP-…</span>). Las variables nuevas que apruebes se agregan al catálogo, y las preguntas quedan abiertas para responderlas en el chat.</li>
+      </ol>
+      <div class="callout warn"><b>Qué ve Claude.</b> Solo nombres de columnas y estadísticas; en las columnas de texto con pocas categorías, también esas categorías y su frecuencia. Nunca filas. Las columnas con posibles datos personales (correo, teléfono, nombre…) se marcan y no envían valores. Claude pide tu permiso la primera vez y usa tu cuenta. El archivo no se sube a ningún lado y sus filas no se guardan: solo los valores calculados.</div>
+    </section>
+
+    <section id="how-stage">
+      <h3>El ciclo de vida decide qué preguntar primero</h3>
+      <p>Una marca no necesita las mismas respuestas en todas sus etapas. Al crear un producto indicas su etapa, y el chat empieza por las variables que más pesan en ella. Es una regla fija (determinista), no una estimación. El resto del catálogo se pregunta después.</p>
+      <div class="card scroll" style="margin-top:12px"><table class="tbl" id="how-etapas"></table></div>
+    </section>
+
+    <section id="how-engine">
+      <h3>Cómo se analiza</h3>
+      <div class="callout warn"><b>Estado:</b> la primera versión del motor ya está en la pestaña Motor. Calcula en tu navegador y cada análisis solo corre cuando hay datos suficientes según los umbrales de la configuración; si no, dice qué falta. Claude puede sugerir qué analizar viendo solo conteos, nunca valores. Los niveles multinivel y bayesiano siguen pendientes.</div>
+      <h4>Qué hace la versión 1</h4>
+      <ul>
+        <li><b>Panorama y brechas:</b> resumen de cada variable numérica y, para un nodo, dónde se aleja de sus pares y qué tienen los demás que a él le falta.</li>
+        <li><b>Asociaciones:</b> correlaciones de Pearson y Spearman con valor p ajustado por el número de parejas probadas y una prueba de estabilidad que quita una unidad a la vez.</li>
+        <li><b>Regresión lineal:</b> con hasta 5 variables explicativas, solo si hay unidades suficientes.</li>
+        <li><b>Perfiles y cross-selling:</b> similitud de Gower entre clientes de distintas empresas y, desde cierto umbral, productos de la otra empresa para explorar.</li>
+        <li><b>Pronóstico:</b> tendencia lineal con intervalo del 80%, con un mínimo de periodos.</li>
+      </ul>
+      <p>Un resultado se vuelve candidato a hallazgo solo si cumple el mínimo de datos, es significativo, su efecto es relevante y se sostiene al quitar cada unidad. Tú decides si lo registras.</p>
+      <h4>Un motor que sube de nivel según los datos</h4>
+      <p>Con pocos datos no tiene sentido una regresión. Por eso el motor avanza por escalones y cada uno exige más datos que el anterior.</p>
+      <div class="card scroll" style="margin-top:12px"><table class="tbl">
+        <thead><tr><th>Nivel</th><th>Qué hace</th><th>Técnicas</th></tr></thead>
+        <tbody>
+          <tr><td>1 · Descriptivo</td><td>Qué se consume más, qué resultados hay, cómo se distribuyen los datos.</td><td>Frecuencias, Pareto, promedios, KPIs</td></tr>
+          <tr><td>2 · Asociación</td><td>Qué cosas se mueven juntas y qué productos se consumen juntos.</td><td>Correlaciones, soporte, confianza y lift</td></tr>
+          <tr><td>3 · Inferencial</td><td>Qué variables explican un resultado y qué perfiles se parecen.</td><td>Regresión lineal y logística, clustering jerárquico</td></tr>
+          <tr><td>4 · Multinivel y bayesiano</td><td>Considera que el cliente vive dentro de una empresa y el grupo; estima con incertidumbre.</td><td>Modelos jerárquicos, bayesianos</td></tr>
+        </tbody></table></div>
+      <p style="margin-top:10px">El umbral de datos para pasar de un nivel a otro se fija con el equipo cuando haya información real; no está definido todavía.</p>
+      <div class="callout" style="margin-top:12px"><b>Una consecuencia del cliente como arquetipo.</b> Los datos se capturan agregados: la unidad es segmento de cliente (buyer persona) × producto × periodo, no la compra de cada comprador. Eso simplifica la privacidad, pero deja menos filas para estadística, así que las técnicas más exigentes (regresión, multinivel) tendrán que esperar a tener suficientes periodos y empresas.</div>
+      <h4>Variables dependientes e independientes</h4>
+      <p>Cada variable numérica tiene un rol: <b>dependiente</b> (lo que queremos explicar, como la recompra o el abandono), <b>independiente</b> (lo que puede explicarlo, como precio, canal o satisfacción), de <b>control</b> (como B2B o B2C) o se ignora. El motor propone los roles por el nombre de la variable y se corrigen en Motor › Configuración. Así sabe qué técnica aplicar sin que se lo indiques cada vez.</p>
+      <h4>Determinista y probabilístico: se usan los dos</h4>
+      <ul>
+        <li><b>Determinista:</b> reglas y criterios claros. Por ejemplo, la etapa del producto define qué se pregunta primero, y un criterio de aceptación decide si una sugerencia es válida.</li>
+        <li><b>Probabilístico:</b> estimaciones con incertidumbre, siempre con su intervalo de confianza.</li>
+      </ul>
+      <h4>Criterios de aceptación</h4>
+      <p>Un hallazgo solo pasa a sugerencia si cumple: una cantidad mínima de datos, significancia estadística, un efecto de tamaño relevante y estabilidad a lo largo del tiempo. Los valores concretos se definen con datos reales.</p>
+      <h4>De la pregunta de negocio al método</h4>
+      <div class="card scroll" style="margin-top:12px"><table class="tbl">
+        <thead><tr><th>Pregunta</th><th>Qué se mira</th><th>Método</th></tr></thead>
+        <tbody>
+          <tr><td>¿Qué producto se consume más?</td><td>Consumo por cliente y producto</td><td>Descriptivo, Pareto</td></tr>
+          <tr><td>¿Qué le falta a mi producto?</td><td>Qué consumen perfiles parecidos que no consumen el mío; satisfacción y motivos de abandono</td><td>Análisis de brechas, comparación de perfiles</td></tr>
+          <tr><td>¿Cuándo hacer cross-selling?</td><td>Qué productos de otras empresas consumen perfiles parecidos</td><td>Similitud de perfiles, lift de asociación</td></tr>
+          <tr><td>¿Cómo mejorar?</td><td>Qué variables explican la recompra o el abandono</td><td>Regresión lineal y logística</td></tr>
+          <tr><td>¿Qué resultados hay?</td><td>Indicadores por empresa, producto y cliente</td><td>KPIs y tableros</td></tr>
+        </tbody></table></div>
+    </section>
+
+    <section id="how-an">
+      <h3>Análisis y documentos</h3>
+      <p>La pestaña Análisis junta lo capturado, lo que encontró el motor y los hallazgos con sus sugerencias, y lo presenta de cuatro maneras:</p>
+      <ul>
+        <li><b>Diagnóstico por empresa:</b> qué se sabe, qué falta, brechas frente a sus pares, hallazgos, sugerencias y calidad de los datos. Sirve a la empresa para mejorar su producto y su mercado.</li>
+        <li><b>Comparativo del grupo:</b> cómo se ven las empresas entre sí, por cobertura, corrientes e indicadores comparables.</li>
+        <li><b>Casos de uso de cliente:</b> quién es el cliente de cada empresa, qué consume, qué lo mueve, cómo llega y las oportunidades de cross-selling. Sirve al equipo comercial.</li>
+        <li><b>Lectura por corriente:</b> qué dice cada disciplina de una empresa, área por área.</li>
+      </ul>
+      <p>Los textos de la pestaña salen de plantillas aplicadas a los datos, así que son reproducibles y no inventan nada. El mismo contenido se puede descargar como documento de Word, con los textos narrativos redactados por Claude para quien lo va a leer (la empresa, el equipo comercial o el equipo de análisis). Claude recibe el contenido de las secciones, solo con cifras y conteos salvo que marques enviar también los textos libres, y se le pide no inventar datos ni afirmar causalidad. Si Claude no está disponible, el documento se puede generar con los textos de plantilla.</p>
+    </section>
+
+    <section id="how-sug">
+      <h3>De hallazgo a sugerencia</h3>
+      <p>Un dato suelto no es una sugerencia. El camino tiene cinco pasos, tomados de la matriz de insight del documento de referencia:</p>
+      <ol>
+        <li><b>Hallazgo:</b> el dato o patrón que apareció.</li>
+        <li><b>Dimensiones que conecta:</b> en qué áreas del grafo se apoya.</li>
+        <li><b>Insight:</b> por qué pasa.</li>
+        <li><b>Implicación:</b> qué significa para el negocio.</li>
+        <li><b>Recomendación:</b> qué hacer, con responsable, plazo e indicador de seguimiento.</li>
+      </ol>
+      <p>Se registran desde el chat (Capturar › Registrar hallazgos y sugerencias) o se aceptan desde la bandeja de Sugerencias: eliges los datos en los que se apoya el hallazgo, y de ellos se deduce qué corrientes y áreas conecta. Cada hallazgo y cada sugerencia reciben su ID, y el hallazgo guarda los IDs de las observaciones en las que se apoya. Si alguien duda de una sugerencia, se puede llegar hasta el dato original, quién lo capturó y de qué fuente salió.</p>
+      <h4>Cross-selling entre empresas del grupo (ejemplo ilustrativo)</h4>
+      <div class="callout">Supón que el cliente de la empresa A y el de la empresa B tienen perfiles parecidos, y que el cliente de B consume un producto que el de A todavía no. El modelo sugeriría explorar ese producto con el cliente de A, y diría en qué variables se parecen y de qué observaciones sale la comparación.</div>
+    </section>
+
+    <section id="how-sg">
+      <h3>Sugerencias: señales, borradores y seguimiento</h3>
+      <p>La pestaña Sugerencias convierte lo capturado en acciones, en cuatro pasos:</p>
+      <ol>
+        <li><b>Señales.</b> Los detectores revisan los datos y levantan: hallazgos que aún no tienen sugerencia, brechas frente a pares, oportunidades de cross-selling por perfil parecido, huecos de datos, alertas (por ejemplo satisfacción baja, NPS nulo, relación LTV/CAC menor a 3, márgenes negativos, liquidez menor a 1, margen unitario bajo), valor del producto o la empresa (las mismas variables en sentido bueno) y problemas de calidad de los datos. Los umbrales de las alertas son reglas iniciales y hay que validarlos.</li>
+        <li><b>Borradores.</b> Claude redacta un borrador de cada señal: acción, por qué, responsable (un rol), plazo, cómo se medirá, una variable numérica para medirlo, dirección, meta, impacto y esfuerzo. Si la evidencia no alcanza para recomendar una acción, lo marca como insight. Tú aceptas, editas o descartas cada borrador; nada se registra solo.</li>
+        <li><b>Prioridad.</b> Cada sugerencia se ubica por impacto y esfuerzo (1 a 5). El puntaje es impacto × (6 − esfuerzo), y la matriz las reparte en ganancias rápidas, apuestas grandes, rellenos y cosas por repensar.</li>
+        <li><b>Seguimiento.</b> Al aceptar una sugerencia se guarda el valor base de su indicador. Con los datos que se capturen después, el sistema mide si el indicador mejoró: cuenta como mejora un cambio de al menos 5% en la dirección buena, y avisa cuando se alcanza la meta. El tablero muestra sugerencias por empresa, estado y responsable, las vencidas y qué pasó con los indicadores.</li>
+      </ol>
+      <div class="callout warn"><b>Qué ve Claude.</b> La evidencia de cada señal: cifras, nombres de variables y de empresas, y los textos de hallazgos. No ve filas de archivos importados ni los textos libres capturados. Le pedimos no inventar cifras ni causas; una brecha no dice por sí sola si más o menos es mejor, y eso lo decide quien revisa el borrador.</div>
+    </section>
+
+    <section id="how-cv">
+      <h3>Captura conversacional por bloques</h3>
+      <p>En lugar de una pregunta por variable, el chat conversa por bloques: grupos de hasta seis variables de una misma área. Para cada bloque:</p>
+      <ol>
+        <li><b>Te explica de qué trata</b> en una o dos frases y te hace una sola pregunta abierta. Respondes con tus palabras, aunque sea a medias.</li>
+        <li><b>Te sugiere respuestas</b> cuando puede deducirlas de la ficha de la empresa, de lo que ya capturaste o de lo que ha aprendido. Tocas una para usarla.</li>
+        <li><b>Si no sabes qué responder</b>, te da ejemplos para una empresa como la tuya y te dice dónde suele estar ese dato. También puede ayudarte a estimarlo, o lo dejas para después y queda pendiente en tu ruta.</li>
+        <li><b>Muestra lo que entendió</b> antes de guardar: qué variables llenó, cuáles dijiste tú, cuáles dedujo (para que las confirmes) y cuáles faltan. Puedes corregir cualquier valor. Solo se guarda lo que confirmas.</li>
+        <li><b>Pregunta por lo que falta</b>, una cosa a la vez y con un ejemplo, hasta dos veces por bloque.</li>
+      </ol>
+      <h4>Lo que va aprendiendo</h4>
+      <p>De cada conversación anota, por empresa, términos, competidores, productos y datos que no conviene volver a preguntar. Esa memoria se ve y se edita en el panel «Lo que he aprendido», se comparte con todo el equipo y se usa en los bloques siguientes. Si algo contradice lo anterior, te avisa.</p>
+      <p>Lo que escribas en la conversación se envía a Claude para interpretarlo, junto con la ficha de la empresa y lo ya capturado; no se envían archivos. Cada dato guardado conserva tus palabras como nota. Si Claude no está disponible, el chat sigue con una pregunta a la vez, y esa opción también está siempre a un toque.</p>
+    </section>
+
+    <section id="how-eq">
+      <h3>Captura de lo particular a lo general, y en equipo</h3>
+      <p>Al elegir una empresa en Capturar, el chat propone una ruta que va de lo más específico a lo más general:</p>
+      <ol>
+        <li><b>Productos.</b> Cada producto de la empresa, con sus variables de producto.</li>
+        <li><b>Segmentos de cliente.</b> Cada buyer persona, con las variables que aplican a su tipo.</li>
+        <li><b>Empresa.</b> Sus variables propias, ya con el contexto de sus productos y clientes.</li>
+        <li><b>Grupo.</b> Un cierre: cuántos nodos de la empresa están completos, cuántas empresas del grupo ya terminaron, y de ahí a hallazgos, sugerencias o la siguiente empresa.</li>
+      </ol>
+      <p>La ruta se ve completa en el panel de la derecha, con el avance de cada nodo, y al terminar uno el chat ofrece el <b>siguiente nivel</b> pendiente. No es obligatoria: puedes saltar a cualquier nodo.</p>
+      <h4>Cuando más personas capturan</h4>
+      <p>Si compartes el artefacto con permiso de Editor o Colaborador, cada dato queda a nombre de quien lo capturó. El panel <b>Equipo</b>, junto al avance del nodo, se actualiza en vivo: muestra quién ha registrado datos, cuántos, en cuántos nodos y cuándo fue su última actividad, marca como «nuevos» los registros recientes de otras personas y avisa cuando alguien registra algo. El avance de la ruta y el de cada nodo también se actualizan solos. Si alguien ya registró la variable que ibas a responder, el chat la salta y te lo dice.</p>
+      <p>En modo local, sin base compartida, el panel dice «Sin sincronizar» y nada se comparte.</p>
+    </section>
+
+    <section id="how-bo">
+      <h3>Backoffice de variables</h3>
+      <p>El Backoffice es el catálogo maestro de todo lo que medimos, en la estructura general tipo Tama: no guarda datos de ninguna empresa. Sirve para saber qué mide cada variable, qué pregunta se hace y a quién aplica, y para ir versionándolo.</p>
+      <ul>
+        <li><b>Matriz.</b> Una fila por variable, con su corriente, el análisis (área y bloque), qué mide, la pregunta por capturar, a quién aplica (empresa, producto o cliente, y qué tipos de cliente), su estado y su versión. Se filtra por corriente, análisis, nivel, tipo de cliente, estado o texto, y se exporta a CSV.</li>
+        <li><b>Ficha de la variable.</b> Al tocar una fila se abre su ficha: pregunta, guía, definición operacional (qué mide, unidad, escala, ejemplo y cómo se calcula), dueño del dato, frecuencia de actualización, relaciones con otras variables (duplica a, se calcula con, depende de), a qué tipos de cliente aplica y su estado: borrador, validada, en uso o descontinuada. También muestra su cobertura real y su rol en el motor.</li>
+        <li><b>Versiones por variable.</b> Cada cambio guardado crea una versión nueva con quién, cuándo y una nota obligatoria de qué cambió y por qué. Se puede restaurar una versión anterior. Los datos guardan con qué versión de la variable se preguntaron.</li>
+        <li><b>Lanzamientos del catálogo.</b> Un lanzamiento (v1.0, v1.1…) congela la versión de cada variable y guarda qué cambió respecto al lanzamiento anterior. Los menores son ajustes y los mayores, cambios de estructura.</li>
+        <li><b>Borradores de Claude.</b> Claude puede proponer la ficha de una variable o de las ocho visibles que aún no tienen una. Recibe solo la descripción de la variable y sus candidatas a relación, nunca datos de empresas. Sus propuestas entran como «borrador» para que el equipo las valide.</li>
+        <li><b>Descontinuar no borra.</b> Una variable descontinuada deja de preguntarse y de contarse en la cobertura, pero los datos que ya se capturaron se conservan.</li>
+      </ul>
+      <div class="callout warn"><b>Las fichas iniciales son un borrador.</b> La definición, la unidad, la escala, el ejemplo, la frecuencia y el dueño de las 649 variables se arman con lo que ya existía y se marcan «borrador» hasta que el equipo las valide. Las relaciones obvias, como qué variables duplican a otras o se calculan con otras, también quedaron para validar.</div>
+    </section>
+
+    <section id="how-read">
+      <h3>Cómo leer el grafo</h3>
+      <ul>
+        <li><b>Nodos grandes:</b> Grupo, Empresa y Producto en cian, y Cliente en blanco. El Cliente y los Productos están dentro de cada empresa.</li>
+        <li><b>Satélites (naranja):</b> una corriente de análisis cada uno, colgando del Grupo. Al abrirlos se ve su estructura completa, con borde punteado porque son plantillas, y cuánto se ha capturado en las empresas.</li>
+        <li><b>Clic en una empresa, un cliente o un producto:</b> abre sus 13 corrientes (nodos naranja), las mismas que tiene el Grupo pero con datos; las que aún no tienen datos se ven tenues. Un segundo clic lo cierra.</li>
+        <li><b>Clic en una corriente:</b> abre sus áreas.</li>
+        <li><b>Clic en un área:</b> abre sus variables. Cada color es una dimensión.</li>
+        <li><b>Variable con color lleno:</b> tiene dato. <b>Con borde y sin relleno:</b> pendiente. <b>Gris:</b> marcada como “No aplica”.</li>
+        <li><b>Clic en una variable:</b> abre su ficha con el valor guardado, de dónde salió y el historial. Desde ahí puedes ir al chat a capturarla.</li>
+        <li><b>Línea punteada entre dos clientes:</b> perfiles parecidos entre empresas distintas.</li>
+        <li><b>“Solo lo capturado”:</b> esconde las variables pendientes para ver qué ramas ya tienen información.</li>
+      </ul>
+    </section>
+
+    <section id="how-state">
+      <h3>Estado y siguientes pasos</h3>
+      <div class="card scroll"><table class="tbl">
+        <thead><tr><th>Pieza</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>Nodos Grupo, Empresa, Producto y Cliente, con catálogo abierto de variables</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Satélite Análisis de mercado, con Marketing dentro</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Satélites de las demás corrientes (antropología, finanzas, economía y más), con estructura inicial</td><td><span class="badge part">Borrador por validar</span></td></tr>
+          <tr><td>IDs propios con dígito verificador y trazabilidad</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Captura conversacional con prioridad por etapa</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Base compartida y exportación a CSV y JSON</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Grafo 2D conectado a lo capturado</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Cruce entre clientes de distintas empresas por perfil parecido</td><td><span class="badge part">Regla simple</span></td></tr>
+          <tr><td>Roles de las variables y umbrales de suficiencia de datos, editables</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Motor estadístico: panorama y brechas, asociaciones, regresión, perfiles, cross-selling y pronóstico</td><td><span class="badge part">Versión 1</span></td></tr>
+          <tr><td>Modelos multinivel y bayesianos, regresión logística</td><td><span class="badge todo">Por construir</span></td></tr>
+          <tr><td>Importación de CSV con propuesta de mapeo, variables nuevas y preguntas</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Registro de hallazgos y sugerencias, ligados a los datos que los sustentan</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Análisis por empresa, grupo, cliente y corriente, con documento de Word</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Hallazgos candidatos propuestos por el motor, que tú aceptas</td><td><span class="badge ok">Listo</span></td></tr>
+          <tr><td>Sugerencias: señales, borradores de Claude, bandeja, prioridad, seguimiento del indicador y tablero</td><td><span class="badge part">Versión 1</span></td></tr>
+          <tr><td>Backoffice: matriz de variables, fichas con versión, lanzamientos del catálogo y borradores de Claude</td><td><span class="badge part">Versión 1</span></td></tr>
+        </tbody></table></div>
+      <div class="callout warn" style="margin-top:12px"><b>Dos advertencias.</b> El catálogo base sale de un análisis documental del sitio de Smartketing: describe lo que ellos declaran analizar, no lo que ejecutan, y sus indicadores sugeridos son inferencias. Conviene validar cada variable antes de usarla como criterio. Las estructuras de las demás corrientes son un borrador armado desde marcos estándar de cada disciplina, y las preguntas de muchas variables se redactaron automáticamente a partir de sus nombres: hay que validarlas y afinarlas. Además, si ya habías capturado variables de consumidor o shopper sobre un producto, esos datos siguen en la base asociados a ese producto; ahora esas variables se capturan sobre el cliente.</div>
+    </section>
+  </div>
+</main>
+{{VISTAS_EXTRA}}</div>
+{{PRE}}<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script>
+{{SCRIPT}}
+</script>
+</body>
+</html>
